@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { UserTypes } = require('./../models/constants');
 const { generatePassword, validatePassword } = require('./../lib/generatePassword')
-const jwtExpirySeconds = 300;
+const {jwtExpirySeconds} = require('./constants');
 const TOKEN_KEY = process.env.TOKEN_KEY;
 exports.login = async (req, res) => {
 
@@ -21,7 +21,7 @@ exports.login = async (req, res) => {
 
         if (validatePassword(password, hash, salt)) {
 
-            const token = jwt.sign({ user_id: user._id, username }
+            const token = jwt.sign({ user_id: user._id, username, role: user.role }
                 , TOKEN_KEY, {
                 algorithm: "HS256",
                 expiresIn: jwtExpirySeconds,

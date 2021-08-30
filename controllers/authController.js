@@ -5,6 +5,7 @@ const { generatePassword, validatePassword } = require('./../lib/generatePasswor
 const { jwtExpirySeconds } = require('./constants');
 const randomize = require('randomatic');
 const date = require('date-and-time');
+const logger = require("../config/logger");
 
 const { TOKEN_KEY } = process.env;
 
@@ -45,7 +46,8 @@ exports.login = async (req, res) => {
         }
         return res.status(401).json({ message: 'Wrong password' });
     } catch (err) {
-        console.log(err);
+        logger.error(err.msg || err.message || err);
+
         return res.status(500).json({ message: 'Database error!' });
     }
 }
@@ -66,7 +68,7 @@ exports.register = async (req, res) => {
     try {
 
         //we should only know that user is exist with that username or not so call lean on findUser method to
-        //just fetch neccesary data and consume much less memory and it returns purly vanilla javasript 
+        //just fetch neccesary data and consume much less memory and it returns purly vanilla javascript 
         //It is good to be used when we want to only read the document. NOT writing on document
         const oldUser = await User.findOne({ username, }).lean();
 
@@ -123,7 +125,7 @@ exports.register = async (req, res) => {
         //TODO: remove after testing. Send confirmation code to user
         return res.status(201).json({ message: 'New user created successfully! Enter ur confirmation code.', code: confirmationCode });
     } catch (err) {
-        console.log(err.message || err.msg || err);
+        logger.error(err.message || err.msg || err);
         if (err instanceof jwt.JsonWebTokenError) {
             return res.status(401).end();
         }
@@ -178,7 +180,7 @@ exports.confirmUser = async (req, res) => {
             return res.status(400).json({ message: 'code is wrong or maybe is expired!' });
         }
     } catch (err) {
-        console.log(err)
+        logger.error(err.msg || err.message || err);
         // console.log(err.message || err.msg || err);
         return res.status(500).json({ message: 'Database error!' })
     }
@@ -249,7 +251,7 @@ exports.sendConfirmationCode = async (req, res) => {
             }
         }
     } catch (err) {
-        console.log(err)
+        logger.error(err.msg || err.message || err);
         // console.log(err.message || err.msg || err);
         return res.status(500).json({ message: 'Database error!' })
     }
@@ -259,7 +261,6 @@ exports.sendConfirmationCode = async (req, res) => {
 
 
 exports.logout = async (req, res) => {
-    console.log('try to logout');
     res.cookie("token", undefined, { maxAge: 0 });
 
     return res.status(200).json({ message: 'logout successfully' });

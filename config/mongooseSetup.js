@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose');
+const logger = require('./logger');
 
 module.exports = async () => {
     const MONGIOSE_URL = process.env.MONGOOSE_URL;
@@ -12,8 +13,9 @@ module.exports = async () => {
             useFindAndModify: false
         });
 
-        console.log('MongoDB connected!!');
+        logger.info('MongoDB connected!!');
     } catch (error) {
-        console.log(`${error} mongoDB didn't connect!`);
+
+        logger.error(`${error} mongoDB didn't connect!`);
     }
 }

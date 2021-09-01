@@ -7,17 +7,19 @@ const fse = require('fs-extra');
 const multer = require('multer');
 const multerConfig = require('./../config/multer');
 const Post = require('../models/Post');
-const upload = multerConfig(uploadPath, maximumFileSize, ['png', 'jpeg', 'txt', 'pdf']);
+const logger = require('../config/logger');
 
 exports.createPost = async (req, res) => {
-    console.log(req.body);
-    // const upload = multer({ dest: uploadPath });
-    upload.single('new-post')(req, res, async function (err) {
-        if (err) {
-            console.log(err.message || err.msg);
-            if (err instanceof multer.MulterError) {
-                console.log('1');
 
+    //TODO: specify what types of file should be uploaded
+    const validFileTypes = ['png', 'jpeg'];
+    const upPath = path.join(uploadPath, 'posts/photos')
+    const upload = multerConfig(upPath, maximumFileSize, validFileTypes);
+
+    upload.single('photo')(req, res, async function (err) {
+        if (err) {
+            logger.error(err.message || err.msg);
+            if (err instanceof multer.MulterError) {
                 return res.status(406).json({ message: `upload failed! due to an error: ${err.message}` });
             }
 
@@ -26,59 +28,88 @@ exports.createPost = async (req, res) => {
             }
             return res.status(406).json({ message: `upload failed! due to an error: ${err.message || err.msg}` });
         }
-        //means successfull upload!
-        console.log('file uploaded!');
 
         if (!req.file) {
-            return res.status.json({ message: 'Upload failed!' });
+            return res.status(500).json({ message: 'Upload failed!' });
         }
 
-        const photoPath = req.file.path;
-        const name = req.body.name;
-        const description = req.body.description;
+        //means successfull upload!
+        logger.info('file uploaded!');
 
-        if (!(name && description)) {
+        const { title, caption } = req.body;
+        if (!(title && caption)) {
             return res.status(400).json({ message: 'all input is required!' });
         }
+
         try {
-            const post = new Post({ name, description, photoPath });
+            //post fields:
+            // title
+            // caption
+            // photo
+            // comments
+            // creator
+            const photoName = req.file.filename;
+            const creator = req.user.user_id;
+            const post = new Post({
+                title, caption, creator,
+                photo: photoName
+            });
 
             await post.save();
-            // console.log(req.body);
-            // console.log(req.file);
 
-            console.log('post created successfuly!')
+            logger.info('post created successfuly!')
             return res.status(201).json({ post, message: 'post uploaded successfully!' });
         } catch (err) {
-            console.log(err);
-            return res.status(409).json({ message: `Database error: ${err.message}` });
+            logger.error(err.message);
+            return res.status(500).json({ message: `Database error: ${err.message}` });
         }
     });
 
 }
 
-exports.getPost = async (req, res) => {
+exports.getPosts = async (req, res) => {
 
+    try {
+
+        //TODO: add some limitation to fetch posts
+        const posts = await Post.find().lean();
+
+        return res.status(200).json({ posts, });
+    } catch (err) {
+        logger.error(err.message);
+        return res.status(500).json({ message: `Database error: ${err.message}` });
+    }
 }
-
 
 exports.downloadPhoto = (req, res) => {
 
-    const { filePath } = req.body;
+    const { photoName } = req.params;
 
-    if (!filePath) {
-        return res.status(400).json({ message: 'filePath is required!' });
+    if (!photoName) {
+        return res.status(400).json({ message: 'fileName is required!' });
     }
-    const file = __dirname + '\\..\\' + filePath;
 
-    console.log(file);
-    const filename = path.basename(file);
-    const mimetype = mime.lookup(file);
+    const filePath = path.join(__dirname, '..', 'uploads/posts/photos', photoName);
+    const mimetype = mime.lookup(filePath);
 
-    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-    res.setHeader('Content-type', mimetype);
 
-    const filestream = fse.createReadStream(file);
-    filestream.pipe(res);
+    fse.stat(filePath, function (err) {
+        if (err === null) {
+            res.setHeader('Content-disposition', 'attachment; filename=' + photoName);
+            res.setHeader('Content-type', mimetype);
+
+            const filestream = fse.createReadStream(filePath);
+            filestream.pipe(res);
+            return;
+        } else if (err.code === 'ENOENT') {
+            logger.error('Photo not found!!')
+            return res.status(404).json({ message: 'Photo not found!' });
+        } else {
+            return res.status(500).json({ message: 'Something went wrong!' });
+        }
+    })
+
+
+
 
 }

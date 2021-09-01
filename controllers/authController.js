@@ -18,19 +18,19 @@ exports.login = async (req, res) => {
     }
 
     try {
-        const fetchedUser = await User.findOne({ username, }).select('+salt').select('+hash').lean();
+        const fetchedUser = await User.findOneAndSelectAll({ username, }).lean();
 
         if (!fetchedUser) {
             return res.status(404).json({ message: 'User not found!' });
         }
 
-        if (fetchedUser.status !== userStatus.ACCEPTED) {
-            return res.status(403).json({ message: 'User has\'t accepted yet!' })
-        }
-
         const { hash, salt, ...user } = fetchedUser;
 
         if (validatePassword(password, hash, salt)) {
+
+            if (user.status !== userStatus.ACCEPTED) {
+                return res.status(403).json({ message: 'User has\'t accepted yet!' })
+            }
 
             const token = jwt.sign({ user_id: user._id, username, role: user.role }
                 , TOKEN_KEY, {
@@ -142,7 +142,7 @@ exports.confirmUser = async (req, res) => {
 
     try {
 
-        const fetchedUser = await User.findOne({ username, }).select('+confirmation').select('+hash').select('+salt');
+        const fetchedUser = await User.findOneAndSelectAll({ username, }).select('+confirmation');
 
         if (!fetchedUser) {
             return res.status(404).json({ message: 'User not found!' });
@@ -174,7 +174,6 @@ exports.confirmUser = async (req, res) => {
             }
             await fetchedUser.save();
 
-
             return res.status(200).json({ message, })
         } else {
             return res.status(400).json({ message: 'code is wrong or maybe is expired!' });
@@ -198,7 +197,7 @@ exports.sendConfirmationCode = async (req, res) => {
 
     try {
 
-        const fetchedUser = await User.findOne({ username, }).select('+confirmation').select('+hash').select('+salt');
+        const fetchedUser = await User.findOneAndSelectAll({ username, }).select('+confirmation');
 
         if (!fetchedUser) {
             return res.status(404).json({ message: 'User not found!' });
@@ -257,7 +256,6 @@ exports.sendConfirmationCode = async (req, res) => {
     }
 
 }
-
 
 
 exports.logout = async (req, res) => {

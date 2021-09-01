@@ -1,19 +1,28 @@
 const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: true,
     },
-    description: {
+    caption: {
         type: String,
         required: true,
         maxLength: 40
     },
-    photoPath: {
+    photo: {
         type: String,
         required: true,
     },
-
+    comments: {
+        type: [mongoose.Types.ObjectId],
+        ref: 'Comment'
+    },
+    creator: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        required: true,
+        select: false
+    }
 }, { timestamps: true });
 
 const Post = mongoose.model('Post', postSchema);

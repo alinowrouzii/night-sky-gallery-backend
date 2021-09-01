@@ -1,13 +1,14 @@
 const jwt = require("jsonwebtoken");
+const { userTypes } = require("../models/constants");
 
-const TOKEN_KEY = process.env.TOKEN_KEY;
+const { TOKEN_KEY } = process.env;
 
 exports.verifyToken = (req, res, next) => {
     //take the token from cookie
     const token = req.cookies.token
 
     if (!token) {
-        return res.status(403).send("A token is required for authentication");
+        return res.status(401).send("A token is required for authentication");
     }
 
     try {
@@ -23,8 +24,16 @@ exports.verifyToken = (req, res, next) => {
 }
 
 exports.isAdmin = (req, res, next) => {
-    if (req.user.role === 'ADMIN') {
+    if (req.user.role === userTypes.ADMIN) {
         return next();
     }
-    res.status(401).json({ message: 'don\'t have permission cauz u r not admin!' });
+    return res.status(403).json({ message: 'don\'t have permission cauz u r not admin!' });
 }
+
+exports.isSuperAdmin = (req, res, next) => {
+    if (req.user.role === userTypes.SUPER_ADMIN) {
+        return next();
+    }
+    return res.status(403).json({ message: 'don\'t have permission cauz u r not super admin!' });
+}
+

@@ -3,7 +3,7 @@ const { uploadPath, maximumFileSize } = require('./constants');
 const path = require('path');
 const mime = require('mime-types');
 const fse = require('fs-extra');
-
+const mongoose = require('mongoose');
 const multer = require('multer');
 const multerConfig = require('./../config/multer');
 const Post = require('../models/Post');
@@ -20,13 +20,14 @@ exports.createPost = async (req, res) => {
         if (err) {
             logger.error(err.message || err.msg);
             if (err instanceof multer.MulterError) {
-                return res.status(406).json({ message: `upload failed! due to an error: ${err.message}` });
+                return res.status(406).json({ message: 'Upload failed!' });
             }
 
+            //TODO: change this silly line!
             if (err.msg === 'File too large') {
                 return res.status(413).json({ message: `File is larger than ${maximumFileSize / (1024 * 1024)}MB` });
             }
-            return res.status(406).json({ message: `upload failed! due to an error: ${err.message || err.msg}` });
+            return res.status(406).json({ message: 'Upload failed!' });
         }
 
         if (!req.file) {
@@ -64,8 +65,103 @@ exports.createPost = async (req, res) => {
             return res.status(500).json({ message: `Database error: ${err.message}` });
         }
     });
-
 }
+
+
+exports.editPost = async (req, res) => {
+
+    const { fieldsToUpdate, postId } = req.body;
+
+    if (!(fieldsToUpdate && postId)) {
+        return res.status(400).json({ message: 'fieldsToUpdate and postId are required' });
+    }
+
+    const { caption, title } = fieldsToUpdate;
+
+    if (!(caption || title)) {
+        return res.status(400).json({ message: 'fieldsToUpdate is required' });
+    }
+
+    try {
+
+        const id = mongoose.Types.ObjectId(postId);
+        const post = await Post.findOneAndSelectAll({ _id: id });
+        if (!post) {
+            return res.status(404).end();
+        }
+
+        if (caption) {
+            post.caption = caption;
+        }
+        if (title) {
+            post.title = title;
+        }
+
+        await post.save();
+
+        return res.status(200).json({ post: post.toObject() });
+    } catch (err) {
+        logger.error(err.msg || err.message || JSON.stringify(err));
+        res.status(500).json({ message: 'Database error!' });
+    }
+}
+
+exports.editPostPhoto = async (req, res) => {
+
+    const { postId } = req.query;
+    if (!postId) {
+        return res.status(400).json({ message: 'postId is required' });
+    }
+
+    try {
+        const id = mongoose.Types.ObjectId(postId)
+        const post = await Post.findOneAndSelectAll({ _id: id });
+
+        if (!post) {
+            return res.status(404).end();
+        }
+
+        const validFileTypes = ['png', 'jpeg'];
+        const upPath = path.join(uploadPath, 'posts/photos')
+        const upload = multerConfig(upPath, maximumFileSize, validFileTypes);
+
+        upload.single('photo')(req, res, async function (err) {
+            if (err) {
+                logger.error(err.message || err.msg);
+                if (err instanceof multer.MulterError) {
+                    return res.status(406).json({ message: 'Upload failed!' });
+                }
+
+                //TODO: change this silly line!
+                if (err.msg === 'File too large') {
+                    return res.status(413).json({ message: `File is larger than ${maximumFileSize / (1024 * 1024)}MB` });
+                }
+                return res.status(406).json({ message: 'Upload failed!' });
+            }
+
+            if (!req.file) {
+                return res.status(500).json({ message: 'Upload failed!' });
+            }
+
+            //means successfull upload!
+            logger.info('file uploaded!');
+
+            const photoName = req.file.filename;
+
+            //push current post photo into prevPhotos and then update the current photo
+            post.prevPhotos.push(post.photo);
+
+            post.photo = photoName;
+            await post.save();
+
+            return res.status(200).json({ post: post.toObject() });
+        })
+    } catch (err) {
+        logger.error(err.message || err.msg || err);
+        return res.status(500).json({ message: 'Database error!' });
+    }
+}
+
 
 exports.getPosts = async (req, res) => {
 

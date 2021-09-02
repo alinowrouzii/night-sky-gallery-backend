@@ -18,15 +18,14 @@ exports.login = async (req, res) => {
     }
 
     try {
-        const fetchedUser = await User.findOneAndSelectAll({ username, }).lean();
+        const user = await User.findOneAndSelectAll({ username, });
 
-        if (!fetchedUser) {
+        if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }
 
-        const { hash, salt, ...user } = fetchedUser;
 
-        if (validatePassword(password, hash, salt)) {
+        if (user.verifyPassword(password)) {
 
             if (user.status !== userStatus.ACCEPTED) {
                 return res.status(403).json({ message: 'User has\'t accepted yet!' })
@@ -42,9 +41,10 @@ exports.login = async (req, res) => {
 
             res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 });
 
-            return res.status(200).json({ user, message: 'You have been successfully logged in' });
+            return res.status(200).json({ user: user.toObj(), message: 'You have been successfully logged in' });
         }
-        return res.status(401).json({ message: 'Wrong password' });
+
+        return res.status(401).json({ message: 'گذرواژه اشتباه میباشد' });
     } catch (err) {
         logger.error(err.msg || err.message || err);
 
@@ -120,6 +120,7 @@ exports.register = async (req, res) => {
 
         // console.log(user);
 
+        //TODO: modify below line
         const { salt: saltt, hash: hashh, ...user } = newUser.toObject();
 
         //TODO: remove after testing. Send confirmation code to user
@@ -142,15 +143,14 @@ exports.confirmUser = async (req, res) => {
 
     try {
 
-        const fetchedUser = await User.findOneAndSelectAll({ username, }).select('+confirmation');
+        const user = await User.findOneAndSelectAll({ username, }).select('+confirmation');
 
-        if (!fetchedUser) {
+        if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }
 
-        const { salt, hash, ...user } = fetchedUser.toObject();
 
-        if (!validatePassword(password, hash, salt)) {
+        if (!user.verifyPassword(password)) {
             return res.status(401).json({ message: 'Wrong password!' });
         }
 
@@ -165,14 +165,14 @@ exports.confirmUser = async (req, res) => {
         if (user.confirmation.code === confirmationCode && (date.subtract(expireAt, new Date()).toMilliseconds() > 0)) {
             let message = '';
             if (user.role === userTypes.SUBSCRIBER) {
-                fetchedUser.status = userStatus.ACCEPTED;
+                user.status = userStatus.ACCEPTED;
                 message = 'Your account has been activated! You can login now.';
 
             } else if (user.role === userTypes.ADMIN) {
-                fetchedUser.status = userStatus.SUPER_ADMIN_PENDING;
+                user.status = userStatus.SUPER_ADMIN_PENDING;
                 message = 'You should be waiting for superAdmin to confirm you';
             }
-            await fetchedUser.save();
+            await user.save();
 
             return res.status(200).json({ message, })
         } else {

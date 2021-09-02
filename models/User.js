@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { validatePassword } = require('../lib/generatePassword');
 const { userTypes, userStatus } = require('./constants');
 const userSchema = new mongoose.Schema({
     username: {
@@ -56,6 +57,39 @@ const userSchema = new mongoose.Schema({
 //Selects all fields except confirmation
 userSchema.statics.findOneAndSelectAll = function (user) {
     return this.findOne(user).select('+hash').select('+salt').select('+status').select('+role').select('+phoneNumber');
+}
+
+userSchema.methods.verifyPassword = function (password) {
+
+    const user = this;
+
+    if (validatePassword(password, user.hash, user.salt)) {
+        return true;
+    }
+    return false;
+}
+
+userSchema.methods.setPassword = function (newPassword) {
+
+    const user = this;
+
+    //TODO: set the password
+}
+
+
+userSchema.methods.toObj = function () {
+
+    const user = this;
+    const obj = user.toObject();
+
+    delete obj.hash;
+    delete obj.salt;
+    delete obj.status;
+    delete obj.role;
+    delete obj.confirmation;
+
+    return obj;
+
 }
 
 const User = mongoose.model('User', userSchema);

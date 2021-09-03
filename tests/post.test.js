@@ -41,7 +41,7 @@ afterAll((done) => {
 let Cookies;
 
 // test("POST register /auth/register && confirmUser /auth/confirmUser", async () => {
-//     const user = users[0];
+//     const user = users[1];
 //     // const createdUser = await User.create(user);
 
 //     await supertest(app).post("/auth/register")
@@ -64,7 +64,7 @@ let Cookies;
 
 
 test("POST login /auth/login", async () => {
-    const user = users[0];
+    const user = users[1];
     // const createdUser = await User.create(user);
 
     await supertest(app).post("/auth/login")

@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
-const { validatePassword } = require('../lib/generatePassword');
+const { validatePassword, generatePassword } = require('../lib/generatePassword');
 const { userTypes, userStatus } = require('./constants');
+const randomize = require('randomatic');
+const date = require('date-and-time');
+const logger = require('../config/logger');
+
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -41,49 +45,61 @@ const userSchema = new mongoose.Schema({
         },
         select: false
     },
-    salt: {
-        type: String,
-        required: true,
+    password: {
+        type: {
+            salt: String,
+            hash: String
+        },
         select: false
-    },
-    hash: {
-        type: String,
-        required: true,
-        select: false
-    },
+    }
 }, { timestamps: true });
 
 
 //Selects all fields except confirmation
 userSchema.statics.findOneAndSelectAll = function (user) {
-    return this.findOne(user).select('+hash').select('+salt').select('+status').select('+role').select('+phoneNumber');
+    return this.findOne(user).select('+password').select('+status').select('+role').select('+phoneNumber');
 }
 
 userSchema.methods.verifyPassword = function (password) {
 
     const user = this;
-
-    if (validatePassword(password, user.hash, user.salt)) {
+    if (validatePassword(password, user.password.hash, user.password.salt)) {
         return true;
     }
     return false;
 }
 
-userSchema.methods.setPassword = function (newPassword) {
+userSchema.methods.setPassword = function (password) {
+
+    const user = this;
+    const { hash, salt } = generatePassword(password);
+
+    user.password = {
+        hash, salt
+    }
+}
+userSchema.methods.setConfirmationCode = function () {
 
     const user = this;
 
-    //TODO: set the password
-}
+    const confirmationCode = randomize('0', 6);
+    const now = new Date();
+    //confirmation code expires at 4 minnutes later
+    const expireAt = date.addMinutes(now, 4);
 
+    user.confirmation = {
+        code: confirmationCode,
+        attempt: user.confirmation ? (user.confirmation.attempt + 1) : 4,
+        expireAt,
+    }
+}
 
 userSchema.methods.toObj = function () {
 
     const user = this;
     const obj = user.toObject();
 
-    delete obj.hash;
-    delete obj.salt;
+    delete obj.password;
     delete obj.status;
     delete obj.role;
     delete obj.confirmation;

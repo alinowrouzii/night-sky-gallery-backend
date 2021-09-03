@@ -8,7 +8,7 @@ exports.verifyToken = (req, res, next) => {
     const token = req.cookies.token
 
     if (!token) {
-        return res.status(401).send("A token is required for authentication");
+        return res.status(401).json({message:"A token is required for authentication"});
     }
 
     try {

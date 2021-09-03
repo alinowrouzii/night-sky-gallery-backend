@@ -13,6 +13,11 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    //previous photos
+    prevPhotos: {
+        type: [String],
+        select: false
+    },
     comments: {
         type: [mongoose.Types.ObjectId],
         ref: 'Comment'
@@ -24,6 +29,13 @@ const postSchema = new mongoose.Schema({
         select: false
     }
 }, { timestamps: true });
+
+
+//find document with all fields. It includes fields with select=false
+postSchema.statics.findOneAndSelectAll = function (post) {
+    return this.findOne(post).select('+prevPhotos').select('+creator');
+}
+
 
 const Post = mongoose.model('Post', postSchema);
 

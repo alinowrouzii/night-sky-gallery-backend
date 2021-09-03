@@ -2,8 +2,9 @@ const fse = require('fs-extra');
 
 const multer = require('multer');
 const mime = require('mime-types');
+const logger = require('./logger');
 
-module.exports = (uploadPath, maximumFileSize, singleType, fileType) => {
+module.exports = (uploadPath, maximumFileSize, fileTypes) => {
 
     const storage = multer.diskStorage({
         destination: async (req, file, cb) => {
@@ -12,8 +13,8 @@ module.exports = (uploadPath, maximumFileSize, singleType, fileType) => {
                 await fse.ensureDir(uploadPath);
                 // dir has now been created, including the directory it is to be placed in
             } catch (err) {
-                console.log(err) // => null
-                const multerError = new multer.MulterError()
+                logger.error(err.message || err.msg || err);
+                const multerError = new multer.MulterError();
                 multerError.message = `Can not create directory with path: ${uploadPath}`;
                 return cb(multerError)
             }
@@ -31,18 +32,12 @@ module.exports = (uploadPath, maximumFileSize, singleType, fileType) => {
     const fileFilter = (req, file, cb) => {
 
         const fileExtension = mime.extension(file.mimetype);
-        if (singleType) {
-            if (fileExtension.toLowerCase() === fileType) {
-                // To accept the file pass `true`, like so:
-                return cb(null, true);
-            }
-        } else {
-            if (fileType.some(type => type.toLowerCase() === fileExtension.toLowerCase())) {
-                return cb(null, true);
-            }
+
+        if (fileTypes.some(type => type.toLowerCase() === fileExtension.toLowerCase())) {
+            return cb(null, true);
         }
 
-        console.log('can\'t upload this type of files');
+        logger.error('can\'t upload this type of files');
         const multerError = new multer.MulterError()
         multerError.message = 'File doest\'t accepted!';
         return cb(multerError);

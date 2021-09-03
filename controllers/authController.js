@@ -6,6 +6,7 @@ const { jwtExpirySeconds } = require('./constants');
 const randomize = require('randomatic');
 const date = require('date-and-time');
 const logger = require("../config/logger");
+const validator = require('validator');
 
 const { TOKEN_KEY } = process.env;
 
@@ -81,56 +82,44 @@ exports.register = async (req, res) => {
         if (!phoneReg.test(phoneNumber)) {
             return res.status(400).json({ message: 'phone type is not acceptable! it should be like 09221234567' });
         }
-
-
-        if (password.length < 8) {
-            return res.status(400).json({ message: 'Password should be at least 8 characters!!' });
+        if (validator.isNumeric(password) || validator.isAlpha(password)) {
+            return res.status(400).json({ message: 'گذرواژه باید ترکیبی از اعداد و حروف باشد' });
         }
+        if (password.length < 8) {
+            return res.status(400).json({ message: 'طول گذرواژه حداقل باید 8 باشد' });
+        }
+
 
         //save all phone number by one format
         //Format is: 0922 222 1234
         const phone = '0' + phoneNumber.slice(-10);
 
-        const { salt, hash } = generatePassword(password);
 
         const newUser = new User({
-            firstName, lastName, username, phoneNumber: phone, role, salt, hash,
-            status: userStatus.PENDING
+            firstName, lastName, username, phoneNumber: phone, role,
+            status: userStatus.PENDING,
+            confirmation: {
+                attempt: 0
+            }
         });
+        newUser.setPassword(password);
 
-        const confirmationCode = randomize('0', 6);
-
-        // user.confirmation.code = confirmationCode;
-
-        const now = new Date();
-        //confirmation code expires at 4 minnutes later
-        const expireAt = date.addMinutes(now, 4);
-
-        // //TEST : expires after 20 seconds
-        // const expireAt = date.addSeconds(now, 20);
-
-        newUser.confirmation = {
-            code: confirmationCode,
-            //first attempt to get  confirmation code
-            attempt: 1,
-            expireAt,
-        }
+        newUser.setConfirmationCode();
 
         await newUser.save();
 
-        // console.log(user);
 
         //TODO: modify below line
         const { salt: saltt, hash: hashh, ...user } = newUser.toObject();
 
         //TODO: remove after testing. Send confirmation code to user
-        return res.status(201).json({ message: 'New user created successfully! Enter ur confirmation code.', code: confirmationCode });
+        return res.status(201).json({ message: 'New user created successfully! Enter ur confirmation code.', code: newUser.confirmation.code });
     } catch (err) {
         logger.error(err.message || err.msg || err);
         if (err instanceof jwt.JsonWebTokenError) {
             return res.status(401).end();
         }
-        return res.status(500).json({ message: 'Database error!' });
+        return res.status(500).json({ message: err.message || err.msg });
     }
 }
 
@@ -148,7 +137,6 @@ exports.confirmUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }
-
 
         if (!user.verifyPassword(password)) {
             return res.status(401).json({ message: 'Wrong password!' });
@@ -169,7 +157,12 @@ exports.confirmUser = async (req, res) => {
                 message = 'Your account has been activated! You can login now.';
 
             } else if (user.role === userTypes.ADMIN) {
-                user.status = userStatus.SUPER_ADMIN_PENDING;
+
+                //TODO: change accepted to pending_super_admin
+                //this is just for test
+                user.status = userStatus.ACCEPTED;
+                // user.status = userStatus.SUPER_ADMIN_PENDING;
+
                 message = 'You should be waiting for superAdmin to confirm you';
             }
             await user.save();
@@ -197,55 +190,44 @@ exports.sendConfirmationCode = async (req, res) => {
 
     try {
 
-        const fetchedUser = await User.findOneAndSelectAll({ username, }).select('+confirmation');
+        const user = await User.findOneAndSelectAll({ username, }).select('+confirmation');
 
-        if (!fetchedUser) {
+        if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }
 
 
-        if (!validatePassword(password, fetchedUser.hash, fetchedUser.salt)) {
+        if (!user.verifyPassword(password)) {
             return res.status(401).json({ message: 'Wrong password!' });
         }
 
 
-        if (fetchedUser.status !== userStatus.PENDING || (fetchedUser.status === userStatus.REJECTED)) {
+        if (user.status !== userStatus.PENDING || (user.status === userStatus.REJECTED)) {
             return res.status(400).json({ message: 'Bad request!' });
         }
 
-        const expireAt = fetchedUser.confirmation.expireAt;
+        const expireAt = user.confirmation.expireAt;
 
-        if (date.subtract(expireAt, new Date()).toSeconds() > 0) {
+        //TODO: set 245 just for testing because of expire time of each confimation code(4min=240second)
+        //change 245 to zero after testing
+        if (date.subtract(expireAt, new Date()).toSeconds() > 245) {
             // console.log('seconds', date.subtract(expireAt, new Date()).toSeconds());
 
             return res.status(400).json({ message: 'Your confirmation code is still valid' });
         } else {
 
-            if (fetchedUser.confirmation.attempt <= 5) {
+            if (user.confirmation.attempt <= 5) {
 
-                const confirmationCode = randomize('0', 6);
-
-                const now = new Date();
-                //confirmation code expires at 4 minnutes later
-                const expireAtt = date.addMinutes(now, 4);
-
-                const attempt = fetchedUser.confirmation.attempt + 1;
-
-                fetchedUser.confirmation = {
-                    code: confirmationCode,
-                    attempt: attempt,
-                    expireAt: expireAtt
-                }
-
-                await fetchedUser.save();
+                user.setConfirmationCode();
+                await user.save();
 
                 //TEST: just for test sending confirmation code as response
-                return res.status(200).json({ message: 'New confirmation code sent', code: confirmationCode });
+                return res.status(200).json({ message: 'New confirmation code sent', code: user.confirmation.code });
 
             } else {
-                fetchedUser.status = userStatus.REJECTED;
+                user.status = userStatus.REJECTED;
+                await user.save();
 
-                await fetchedUser.save();
                 return res.status(403).json({ message: 'Your account has been banned!' });
             }
         }

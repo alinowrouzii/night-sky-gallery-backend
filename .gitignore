@@ -1,2 +1,6 @@
 .env
 node_modules
+uploads
+logs
+tests/Data/files
+coverage

@@ -12,7 +12,7 @@ const logger = require('../config/logger');
 exports.createPost = async (req, res) => {
 
     //TODO: specify what types of file should be uploaded
-    const validFileTypes = ['png', 'jpeg'];
+    const validFileTypes = ['png', 'jpeg', 'jpg'];
     const upPath = path.join(uploadPath, 'posts/photos')
     const upload = multerConfig(upPath, maximumFileSize, validFileTypes);
 

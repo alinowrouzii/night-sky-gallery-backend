@@ -8,7 +8,7 @@ router.use([verifyToken, isAdmin]);
 
 router.post('/', createPost);
 
-router.patch('/edit', editPost);
-router.patch('/editPhoto', editPostPhoto);
+router.patch('/', editPost);
+router.patch('/editPhoto/:postId', editPostPhoto);
 
 module.exports = router;

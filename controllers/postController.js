@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const multerConfig = require('./../config/multer');
 const Post = require('../models/Post');
+const validator = require('validator');
+
 const logger = require('../config/logger');
 
 exports.createPost = async (req, res) => {
@@ -18,24 +20,17 @@ exports.createPost = async (req, res) => {
 
     upload.single('photo')(req, res, async function (err) {
         if (err) {
-            logger.error(err.message || err.msg);
             if (err instanceof multer.MulterError) {
-                return res.status(406).json({ message: 'Upload failed!' });
+                if (err.code === 'LIMIT_FILE_SIZE') {
+                    return res.status(413).json({ message: `File is larger than ${maximumFileSize / (1024 * 1024)}MB` });
+                }
             }
-
-            //TODO: change this silly line!
-            if (err.msg === 'File too large') {
-                return res.status(413).json({ message: `File is larger than ${maximumFileSize / (1024 * 1024)}MB` });
-            }
-            return res.status(406).json({ message: 'Upload failed!' });
+            return res.status(406).json({ message: err.message || err.msg || 'Upload failed' });
         }
 
         if (!req.file) {
             return res.status(500).json({ message: 'Upload failed!' });
         }
-
-        //means successfull upload!
-        logger.info('file uploaded!');
 
         const { title, caption } = req.body;
         if (!(title && caption)) {
@@ -82,6 +77,10 @@ exports.editPost = async (req, res) => {
         return res.status(400).json({ message: 'fieldsToUpdate is required' });
     }
 
+    if (!validator.isMongoId(postId)) {
+        return res.status(400).json({ message: 'postId is not valid' });
+    }
+
     try {
 
         const id = mongoose.Types.ObjectId(postId);
@@ -108,11 +107,14 @@ exports.editPost = async (req, res) => {
 
 exports.editPostPhoto = async (req, res) => {
 
-    const { postId } = req.query;
+    const { postId } = req.params;
     if (!postId) {
         return res.status(400).json({ message: 'postId is required' });
     }
 
+    if (!validator.isMongoId(postId)) {
+        return res.status(400).json({ message: 'postId is not valid' });
+    }
     try {
         const id = mongoose.Types.ObjectId(postId)
         const post = await Post.findOneAndSelectAll({ _id: id });
@@ -127,16 +129,12 @@ exports.editPostPhoto = async (req, res) => {
 
         upload.single('photo')(req, res, async function (err) {
             if (err) {
-                logger.error(err.message || err.msg);
                 if (err instanceof multer.MulterError) {
-                    return res.status(406).json({ message: 'Upload failed!' });
+                    if (err.code === 'LIMIT_FILE_SIZE') {
+                        return res.status(413).json({ message: `File is larger than ${maximumFileSize / (1024 * 1024)}MB` });
+                    }
                 }
-
-                //TODO: change this silly line!
-                if (err.msg === 'File too large') {
-                    return res.status(413).json({ message: `File is larger than ${maximumFileSize / (1024 * 1024)}MB` });
-                }
-                return res.status(406).json({ message: 'Upload failed!' });
+                return res.status(406).json({ message: err.message || err.msg || 'Upload failed' });
             }
 
             if (!req.file) {
@@ -157,7 +155,7 @@ exports.editPostPhoto = async (req, res) => {
             return res.status(200).json({ post: post.toObject() });
         })
     } catch (err) {
-        logger.error(err.message || err.msg || err);
+        logger.error(err.message || err.msg || err); 
         return res.status(500).json({ message: 'Database error!' });
     }
 }

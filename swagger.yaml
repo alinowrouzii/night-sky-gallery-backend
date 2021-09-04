@@ -345,6 +345,85 @@ paths:
         '500':
           description: 'Upload failed or database error'
 
+  /post/:
+    get:
+      tags:
+        - 'Post'
+      summary: 'Get all posts'
+      produces:
+        - 'application/json'
+      responses:
+        '200':
+          description: 'posts fetched successfully'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+
+
+  /superAdmin/:
+    get:
+      tags:
+        - 'Super Admin'
+      summary: 'Get all admins'
+      description: 'Get admins based on the status you specified. If the status is not specified, ALL admins will be fetch'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [ACCEPTED, SUPER_ADMIN_PENDING]
+            example: 'ACCEPTED'
+          description: 'ACCEPTED admin is the admin that has been accepted by superUser before. But the SUPER_ADMIN_PENDING admin is waiting for superUser to be accepted.'
+      responses:
+        '200':
+          description: 'Admins fetched successfully'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              example:
+                - _id: '2839284398793849384'
+                  username: 'jesSmith'
+                  firstName: 'Jessica'
+                  lastName: 'Smith'
+                  phoneNumber: '09221234321'
+                  createdAt: '2021-09-03T16:27:39.128Z'
+                  status: 'SUPER_ADMIN_PENDING'
+
+  /superAdmin/{username}:
+    post:
+      tags:
+        - 'Super Admin'
+      summary: 'Verify admin'
+      description: 'Super_Admin verify admin'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: header
+          name: Content-Length
+          schema:
+            type: integer
+            default: 0
+            enum: [0]
+          required: true
+          description: 'Content-Length header should be set to 0'
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+            example: 'jonBarr'
+          description: 'Username of user'
+      responses:
+        '200':
+          description: 'Successful'
                 
 components:
   schemas:
@@ -405,6 +484,14 @@ components:
                 type: string
         creator:
           type: object
+          properties:
+            firstName:
+              type: string
+            lastName:
+              type: string
+            username:
+              type: string
+
       example:
         _id: '92830934823121'
         title: 'new post'

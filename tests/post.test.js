@@ -94,7 +94,8 @@ test("POST createPost /admin", async () => {
 })
 
 
-test("GET getPosts /post && downloadPhoto /posts/downloadPhoto/:photoName", async () => {
+
+test("GET getPosts /post && GET downloadPhoto /posts/downloadPhoto/:photoName", async () => {
     // const createdUser = await User.create(user);
 
     const request = supertest(app).get("/post");
@@ -106,4 +107,80 @@ test("GET getPosts /post && downloadPhoto /posts/downloadPhoto/:photoName", asyn
             .expect(200);
     })
 })
+
+
+test("GET getPosts /post && PATCH editPost /admin/ && PATCH editPhoto /admin/editPhoto", async () => {
+    // const createdUser = await User.create(user);
+
+    const request = supertest(app).get("/post");
+
+    request.cookies = Cookies;
+    await request.expect(200).then(async (res) => {
+        const post_1 = res.body.posts[0];
+
+        let req = supertest(app).patch("/admin/")
+        req.cookies = Cookies;
+
+        await req.send({
+            postId: post_1._id,
+            fieldsToUpdate: {
+                caption: 'this is edited capiton',
+                title: 'this is edited title'
+            }
+        }).expect(200);
+
+        const post_2 = res.body.posts[1];
+        req = supertest(app).patch("/admin/")
+        req.cookies = Cookies;
+
+        await req.send({
+            postId: post_2._id,
+            fieldsToUpdate: {
+                caption: 'this is edited capiton',
+            }
+        }).expect(200);
+
+        const post_3 = res.body.posts[2];
+        req = supertest(app).patch("/admin/")
+        req.cookies = Cookies;
+
+        await req.send({
+            postId: post_3._id,
+            fieldsToUpdate: {
+                title: 'this is edited title'
+            }
+        }).expect(200);
+
+        req = supertest(app).patch("/admin/")
+        req.cookies = Cookies;
+
+        await req.send({
+            postId: post_3._id,
+            fieldsToUpdate: {}
+        }).expect(400);
+
+        req = supertest(app).patch("/admin/")
+        req.cookies = Cookies;
+
+        await req.send({
+            postId: post_3._id,
+        }).expect(400);
+
+        req = supertest(app).patch("/admin/")
+        req.cookies = Cookies;
+        await req.expect(400);
+
+        req = supertest(app).patch(`/admin/editPhoto/${res.body.posts[2]._id}`)
+        req.cookies = Cookies;
+        
+        await req
+        .attach('photo', 'tests/Data/files/image_2.JPG')
+        .expect(200)
+
+        req = supertest(app).patch(`/admin/editPhoto/1234`)
+        req.cookies = Cookies;
+        await req.expect(400);
+    })
+})
+
 

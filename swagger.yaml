@@ -101,6 +101,8 @@ paths:
     post:
       tags:
         - 'Auth'
+      summary: 'send verification code'
+      description: 'Send new confirmation code to user. Each user can requests for new confirmation code at must 5 time.'
       consumes:
       - 'application/json'
       produces:
@@ -200,7 +202,7 @@ paths:
         - 'Admin'
       summary: 'Create new post by admin'
       consumes:
-      - 'application/json'
+      - 'multipart/form-data'
       produces:
       - 'application/json'
       requestBody:
@@ -231,8 +233,119 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#components/schemas/Post'
-            
+                $ref: '#/components/schemas/Post'
+              example:
+                _id: '92830934823121'
+                title: 'new post'
+                caption: 'this is a caption'
+                photo: 'new photo'
+                createdAt: '2021-09-03T16:27:39.128Z'
+                comments: ["string"]
+        '413':
+          description: 'File is larger than amount specified in response'
+        '406':
+          description: 'Upload failed'
+        '500':
+          description: 'Upload failed or database error'
+        '400':
+          description: 'All input not entered'
+    patch:
+      tags:
+        - 'Admin'
+      summary: 'Edit post'
+      description: 'Edit title and caption of post. NOT photo'
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: 'object'
+              properties:
+                fieldsToUpdate:
+                  type: 'object'
+                  properties:
+                    caption:
+                      type: string
+                    title:
+                      type: string
+                  description: 'One of caption or title is required!'
+                postId:
+                  type: string
+              required:
+                - fieldsToUpdate
+                - postId
+              example:
+                fieldsToUpdate:
+                  title: 'This is edited title'
+                  caption: 'This is edited caption'
+                postId: '3823094321349039'
+      responses:
+        '200':
+          description: 'Post edited successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: 'All require input not entered, or postId is not valid'
+        '404':
+          description: 'Post not found!'
+        '500':
+          description: 'Database error'
+
+
+  /admin/editPhoto/{postId}:
+    patch:
+      tags:
+        - 'Admin'
+      summary: 'Edit post photo'
+      description: 'Edit photo of post.'
+      consumes:
+        - 'multipart/form-data'
+      produces:
+        - 'application/json'
+      parameters:
+        - in: path
+          name: postId   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+            example: '3242342390438203948'
+          description: The post ID
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  description: 'Only jpg, jpeg and png are acceptable.'
+              required:
+                - photo
+      responses:
+        '200':
+          description: 'Post photo updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: 'Post not found!'
+        '400':
+          description: 'PostId not entered or not valid'
+        '413':
+          description: 'File is larger than amount specified in response'
+        '406':
+          description: 'Upload failed'
+        '500':
+          description: 'Upload failed or database error'
+
+                
 components:
   schemas:
     User:
@@ -273,11 +386,23 @@ components:
         prevPhotos:
           type: array
           items:
-            tyoe: string
+            type: string
         comments:
           type: array
           items:
             type: object
+            properties:
+              user:
+                type: object
+                properties:
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+                  username:
+                    type: string
+              text:
+                type: string
         creator:
           type: object
       example:

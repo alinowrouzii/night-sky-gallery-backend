@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.use([verifyToken, isSuperAdmin]);
 
-router.post('/verifyAdmin', verifyAdmin);
+router.post('/:username', verifyAdmin);
 router.get('/', fetchAdmins);
 
 module.exports = router;

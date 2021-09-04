@@ -5,7 +5,7 @@ const logger = require('./../config/logger');
 
 exports.verifyAdmin = async (req, res) => {
 
-    const { username } = req.body;
+    const { username } = req.params;
 
     if (!username) {
         return res.status(400).json({ message: 'username is required!' });
@@ -13,7 +13,7 @@ exports.verifyAdmin = async (req, res) => {
 
     try {
 
-        const fetchedUser = await User.findOne({ username, role: userTypes.ADMIN });
+        const fetchedUser = await User.findOneAndSelectAll({ username, role: userTypes.ADMIN });
 
         if (!fetchedUser) {
             return res.status(404).json({ message: 'User not found!' });
@@ -25,47 +25,46 @@ exports.verifyAdmin = async (req, res) => {
             await fetchedUser.save();
             return res.status(200).json({ message: 'User activated successully!' })
         }
-
         return res.status(400).json({ message: 'Bad request!' });
 
 
     } catch (err) {
         logger.error(err.message || err.msg || err);
-        return res.status(503).json({ message: 'Something went wrong with Database!' });
+        return res.status(500).json({ message: 'Something went wrong with Database!' });
     }
 
 }
 
 exports.fetchAdmins = async (req, res) => {
 
-    const { filter } = req.body;
+    const { status } = req.query;
 
     try {
 
-        if (filter === userStatus.ACCEPTED) {
+        if (status === userStatus.ACCEPTED) {
 
             const users = await User.find({
                 status: userStatus.ACCEPTED,
                 role: userTypes.ADMIN
-            });
+            }).select('+status').select('+phoneNumber').lean();
             return res.status(200).json({ users, });
         }
-        else if (filter === userStatus.SUPER_ADMIN_PENDING) {
+        else if (status === userStatus.SUPER_ADMIN_PENDING) {
 
             const users = await User.find({
                 status: userStatus.SUPER_ADMIN_PENDING,
                 role: userTypes.ADMIN
-            });
+            }).select('+status').select('+phoneNumber').lean();
             return res.status(200).json({ users, });
         }
         else {
             const users = await User.find({
                 role: userTypes.ADMIN
-            });
+            }).select('+status').select('+phoneNumber').lean();
             return res.status(200).json({ users, });
         }
     } catch (err) {
         logger.error(err.message || err.msg || err);
-        return res.status(503).json({ message: 'Something went wrong with Database!' });
+        return res.status(500).json({ message: 'Something went wrong with Database!' });
     }
 }

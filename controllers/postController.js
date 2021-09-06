@@ -174,19 +174,11 @@ exports.deleteOnePost = async (req, res) => {
     }
 
     try {
+        const deletedPost = await Post.findByIdAndDelete(postId);
 
-        const post = await Post.findById(postId);
-        logger.warn(JSON.stringify(post));
-        const posts = await Post.find();
-        logger.warn(JSON.stringify(posts));
-        
-        
-        // const id = mongoose.Types.ObjectId(postId);
-        await Post.findByIdAndDelete(postId);
-        
-        const postss = await Post.find();
-        logger.warn(JSON.stringify(postss));
-
+        if(!deletedPost){
+            return res.status(404).json({message: 'Post not found!'});
+        }
         return res.status(200).json({ message: 'Post deleted successfully!' });
 
     } catch (err) {

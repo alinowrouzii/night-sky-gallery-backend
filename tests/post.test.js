@@ -109,7 +109,7 @@ test("GET getPosts /post && GET downloadPhoto /posts/downloadPhoto/:photoName", 
 })
 
 
-test("GET getPosts /post && PATCH editPost /admin/ && PATCH editPhoto /admin/editPhoto", async () => {
+test("GET getPosts /post && PATCH editPost /admin/ && PATCH editPhoto /admin/editPhoto && DELETE deletePost /post/:postId", async () => {
     // const createdUser = await User.create(user);
 
     const request = supertest(app).get("/post");
@@ -180,6 +180,18 @@ test("GET getPosts /post && PATCH editPost /admin/ && PATCH editPhoto /admin/edi
         req = supertest(app).patch(`/admin/editPhoto/1234`)
         req.cookies = Cookies;
         await req.expect(400);
+        
+        
+        //Delete post tests
+        req = supertest(app).delete(`/admin/1234`)
+        req.cookies = Cookies;
+        await req.expect(400);
+
+
+        req = supertest(app).delete(`/admin/${res.body.posts[0]._id}`);
+        req.cookies = Cookies;
+        await req.expect(200);
+
     })
 })
 

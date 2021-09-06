@@ -196,7 +196,7 @@ paths:
         '401':
           description: 'The User is not authenticated yet'
 
-  /admin/:
+  /admin/post/:
     post:
       tags:
         - 'Admin'
@@ -249,55 +249,8 @@ paths:
           description: 'Upload failed or database error'
         '400':
           description: 'All input not entered'
-    patch:
-      tags:
-        - 'Admin'
-      summary: 'Edit post'
-      description: 'Edit title and caption of post. NOT photo'
-      consumes:
-      - 'application/json'
-      produces:
-      - 'application/json'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: 'object'
-              properties:
-                fieldsToUpdate:
-                  type: 'object'
-                  properties:
-                    caption:
-                      type: string
-                    title:
-                      type: string
-                  description: 'One of caption or title is required!'
-                postId:
-                  type: string
-              required:
-                - fieldsToUpdate
-                - postId
-              example:
-                fieldsToUpdate:
-                  title: 'This is edited title'
-                  caption: 'This is edited caption'
-                postId: '3823094321349039'
-      responses:
-        '200':
-          description: 'Post edited successfully'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        '400':
-          description: 'All require input not entered, or postId is not valid'
-        '404':
-          description: 'Post not found!'
-        '500':
-          description: 'Database error'
-
-
-  /admin/editPhoto/{postId}:
+          
+  /admin/post/editPhoto/{postId}:
     patch:
       tags:
         - 'Admin'
@@ -345,10 +298,62 @@ paths:
         '500':
           description: 'Upload failed or database error'
   
-  /admin/{postId}:
+  /admin/post/{postId}:
+    patch:
+      tags:
+        - 'Admin'
+      summary: 'Edit post'
+      description: 'Edit title and caption of post. NOT photo'
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+            description: 'The post id'
+            example: '392384794879848499'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: 'object'
+              properties:
+                fieldsToUpdate:
+                  type: 'object'
+                  properties:
+                    caption:
+                      type: string
+                    title:
+                      type: string
+                  description: 'One of caption or title is required!'
+              required:
+                - fieldsToUpdate
+              example:
+                fieldsToUpdate:
+                  title: 'This is edited title'
+                  caption: 'This is edited caption'
+      responses:
+        '200':
+          description: 'Post edited successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: 'All require input not entered, or postId is not valid'
+        '404':
+          description: 'Post not found!'
+        '500':
+          description: 'Database error'
+
     delete:
       tags:
         - 'Admin'
+      summary: 'Delete post by its id'
       produces:
         - application/json
       parameters:
@@ -368,6 +373,67 @@ paths:
           description: 'Post not found with that id'
         '500':
           description: 'Database error'
+  /admin/post/comment/{commentId}:
+    patch:
+      tags:
+        - 'Admin'
+      summary: 'ACCEPT or REJECT the comment'
+
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Content-Length
+          schema:
+            type: integer
+            default: 0
+            enum: [0]
+          required: true
+          description: 'Content-Length header should be set to 0'
+        - in: query
+          name: status
+          required: true
+          schema:
+            type: string
+            enum: [ACCEPTED, REJECTED, PENDING]
+            example: 'ACCEPTED'
+          description: 'Accept or Reject the comment.'
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+            example: '382749729382982199'
+          description: 'Id of comment'
+      responses:
+        '200':
+          description: 'Comment status changed successfully'
+        '400':
+          description: 'CommentId is not valid'
+        '404':
+          description: 'Comment not found!'
+        '500':
+          description: 'Database error!'
+  /admin/post/comment:
+    get:
+      tags:
+        - 'Admin'
+      summary: 'Get All comments'
+      description: 'Get all comment based on which status admin wants'
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [ACCEPTED, REJECTED, PENDING]
+          description: Optional, If you don't select status, it will fetchs all comments with all different status.
+      responses:
+        '200':
+          description: 'Comments fetched successfully'
+        '500':
+          description: 'Database error!'
 
   /post/:
     get:
@@ -386,6 +452,45 @@ paths:
                 items:
                   $ref: '#/components/schemas/Post'
 
+  /post/comment/{postId}:
+    post:
+      summary: 'Create comment on specified post'
+      tags:
+        - 'Post'
+      produces:
+        - 'application/json'
+      consumes:
+        - 'application/json'
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+            description: 'The post id'
+            example: '2839284398793849384'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text: 
+                  type: string
+                  example: 'This is the comment!!'
+              required:
+                - text
+      responses:
+        '201': 
+          description: 'Comment submitted successfully. user should wait until admin confirm his comment to show in post'
+        '400':
+          description: 'postId is not valid or requestBody not entered'
+        '404':
+          description: 'post not found!'
+        '500':
+          description: 'Database error!'
+
+      
 
   /superAdmin/:
     get:
@@ -542,12 +647,14 @@ components:
       type: 'object'
       properties:
         user:
-          firstName:
-            type: string
-          lastName:
-            type: string
-          username:
-            type: string
+          type: object
+          properties:
+            firstName:
+              type: string
+            lastName:
+              type: string
+            username:
+              type: string
         text:
           type: string
         createdAt:

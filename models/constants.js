@@ -13,3 +13,9 @@ exports.userStatus = {
     ACCEPTED: 'ACCEPTED',
     REJECTED: 'REJECTED'
 }
+
+exports.CommentStatus = {
+    PENDING: 'PENDING',
+    ACCEPTED: 'ACCEPTED',
+    REJECTED: 'REJECTED'
+}

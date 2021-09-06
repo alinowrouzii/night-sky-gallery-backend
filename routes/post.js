@@ -1,6 +1,6 @@
 const express = require('express');
 const { verifyToken } = require('./../middleware/auth')
-const { getPosts, downloadPhoto } = require('./../controllers/postController')
+const { getPosts, downloadPhoto, addCommentToPost } = require('./../controllers/postController')
 const router = express.Router();
 
 //TODO: check that unauthorized users can see the posts or not
@@ -8,5 +8,8 @@ const router = express.Router();
 
 router.get('/', getPosts);
 router.get('/donwloadPhoto/:photoName', downloadPhoto);
+
+router.post('/comment/:postId', verifyToken, addCommentToPost);
+
 
 module.exports = router;

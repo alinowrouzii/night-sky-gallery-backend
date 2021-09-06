@@ -344,6 +344,30 @@ paths:
           description: 'Upload failed'
         '500':
           description: 'Upload failed or database error'
+  
+  /admin/{postId}:
+    delete:
+      tags:
+        - 'Admin'
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: postId   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+            example: '3242342390438203948'
+          description: The post ID
+      responses:
+        '200':
+          description: 'Post deleted successfully'
+        '400':
+          description: 'postId is not valid'
+        '404':
+          description: 'Post not found with that id'
+        '500':
+          description: 'Database error'
 
   /post/:
     get:

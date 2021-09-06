@@ -155,7 +155,42 @@ exports.editPostPhoto = async (req, res) => {
             return res.status(200).json({ post: post.toObject() });
         })
     } catch (err) {
-        logger.error(err.message || err.msg || err); 
+        logger.error(err.message || err.msg || err);
+        return res.status(500).json({ message: 'Database error!' });
+    }
+}
+
+
+exports.deleteOnePost = async (req, res) => {
+
+    const { postId } = req.params;
+
+    if (!postId) {
+        return res.status(400).json({ message: 'postId is required!' });
+    }
+
+    if (!validator.isMongoId(postId)) {
+        return res.status(400).json({ message: 'postId is not valid!' });
+    }
+
+    try {
+
+        const post = await Post.findById(postId);
+        logger.warn(JSON.stringify(post));
+        const posts = await Post.find();
+        logger.warn(JSON.stringify(posts));
+        
+        
+        // const id = mongoose.Types.ObjectId(postId);
+        await Post.findByIdAndDelete(postId);
+        
+        const postss = await Post.find();
+        logger.warn(JSON.stringify(postss));
+
+        return res.status(200).json({ message: 'Post deleted successfully!' });
+
+    } catch (err) {
+        logger.error(err.message || err.msg || JSON.stringify(err))
         return res.status(500).json({ message: 'Database error!' });
     }
 }

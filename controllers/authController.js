@@ -32,7 +32,7 @@ exports.login = async (req, res) => {
                 return res.status(403).json({ message: 'User has\'t accepted yet!' })
             }
 
-            const token = jwt.sign({ user_id: user._id, username, role: user.role }
+            const token = jwt.sign({ _id: user._id, username, role: user.role }
                 , TOKEN_KEY, {
                 algorithm: "HS256",
                 expiresIn: jwtExpirySeconds,

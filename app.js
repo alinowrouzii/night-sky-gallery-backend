@@ -22,7 +22,7 @@ app.use(cors({
 }));
 
 app.use(cookieParser());
-
+app.use('trust proxy')
 
 app.get('/ping',(req,res)=>{
     res.send('pong')

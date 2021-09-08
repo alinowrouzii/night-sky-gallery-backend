@@ -7,7 +7,7 @@ const router = express.Router();
 // router.use(verifyToken);
 
 router.get('/', getPosts);
-router.get('/donwloadPhoto/:photoName', downloadPhoto);
+router.get('/downloadPhoto/:photoName', downloadPhoto);
 
 router.post('/comment/:postId', verifyToken, addCommentToPost);
 

@@ -1,30 +1,37 @@
 
 const mongoose = require('mongoose');
 const logger = require('./logger');
+const {
+    MONGO_USER,
+    MONGO_PASSWORD,
+    MONGO_IP,
+    MONGO_PORT,
+  } = require("./index");
 
 module.exports = async () => {
-    let MONGOOSE_URL;
-    if (process.env.NODE_ENV === 'dev') {
-        MONGOOSE_URL = "mongodb://localhost:27017/devTestDB";
+    const MONGOOSE_URL = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/testDev/?authSource=admin`;
 
-        // mongoose.connect(MONGOOSE_URL, {
-        //     useNewUrlParser: true,
-        //     useUnifiedTopology: true,
-        //     useCreateIndex: true,
-        //     useFindAndModify: false
-        // }).then(() => {
-        //     logger.info('MongoDB connected for dropping');
+    // if (process.env.NODE_ENV === 'development') {
+    //     MONGOOSE_URL = "mongodb://localhost:27017/devTestDB";
 
-        //     mongoose.connection.db.dropDatabase(() => {
-        //         logger.info('Droping Database!');
-        //     });
-        // }).catch(error => {
-        //     logger.error(`Faild to connect mongoDB for auth test: ${error}`);
-        // });
+    //     // mongoose.connect(MONGOOSE_URL, {
+    //     //     useNewUrlParser: true,
+    //     //     useUnifiedTopology: true,
+    //     //     useCreateIndex: true,
+    //     //     useFindAndModify: false
+    //     // }).then(() => {
+    //     //     logger.info('MongoDB connected for dropping');
 
-    } else {
-        MONGOOSE_URL = process.env.MONGOOSE_URL;
-    }
+    //     //     mongoose.connection.db.dropDatabase(() => {
+    //     //         logger.info('Droping Database!');
+    //     //     });
+    //     // }).catch(error => {
+    //     //     logger.error(`Faild to connect mongoDB for auth test: ${error}`);
+    //     // });
+
+    // } else {
+    //     MONGOOSE_URL = process.env.MONGOOSE_URL;
+    // }
 
     try {
         await mongoose.connect(MONGOOSE_URL);

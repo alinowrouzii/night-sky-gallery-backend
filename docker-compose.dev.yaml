@@ -12,12 +12,13 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
+      # - /app/uploads
     environment:
       - NODE_ENV=development
       - MONGO_USER=testUser
       - MONGO_PASSWORD=mongoPassword
 
-    command: npm run dev
+    command: npm run devv
   mongo:
     environment:
     # this is just for dev purpose

@@ -15,6 +15,8 @@ services:
       context: .
       args:
         NODE_ENV: production
+    volumes: 
+      - upload-files:/app/uploads
 
     environment:
       - NODE_ENV=production
@@ -25,3 +27,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+
+volumes:
+  upload-files:

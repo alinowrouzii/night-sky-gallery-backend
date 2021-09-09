@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); 
 const cookieParser = require('cookie-parser')
 const userRoute = require('./routes/user.js');
 const postRoute = require('./routes/post.js');
@@ -10,6 +10,7 @@ const adminRoute = require('./routes/admin.js');
 const superAdminRouter = require('./routes/superAdmin.js');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
+const rateLimiterMiddleware = require('./middleware/rateLimiter.js');
 
 const app = express();
 
@@ -22,7 +23,9 @@ app.use(cors({
 }));
 
 app.use(cookieParser());
-app.use('trust proxy')
+app.use(rateLimiterMiddleware);
+
+app.set('trust proxy');
 
 app.get('/ping',(req,res)=>{
     res.send('pong')

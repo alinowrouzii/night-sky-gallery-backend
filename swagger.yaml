@@ -1,29 +1,27 @@
 openapi: 3.0.0
 
 tags:
-- name: 'Auth'
-  description: ''
-- name: 'Admin'
-  description: ''
-- name: 'Post'
-  description: ''
-
-
+  - name: "Auth"
+    description: ""
+  - name: "Admin"
+    description: ""
+  - name: "Post"
+    description: ""
 paths:
   /auth/register:
     post:
-      tags: 
-        - 'Auth'
-      summary: 'Create new new user'
+      tags:
+        - "Auth"
+      summary: "Create new new user"
       consumes:
-      - 'application/json'
+        - "application/json"
       produces:
-      - 'application/json'
+        - "application/json"
       requestBody:
         content:
           application/json:
             schema:
-              type: 'object'
+              type: "object"
               properties:
                 username:
                   type: string
@@ -40,31 +38,31 @@ paths:
                   type: string
                   description: password must be alphanumeric and at least 8 characters
             example:
-              username: 'jesSmith'
-              firstName: 'Jessica'
-              lastName: 'Smith'
-              phoneNumber: '09221234322'
-              role: 'SUBSCRIBER'
-              password: 'a12345678'
+              username: "jesSmith"
+              firstName: "Jessica"
+              lastName: "Smith"
+              phoneNumber: "09221234322"
+              role: "SUBSCRIBER"
+              password: "a12345678"
       responses:
-        '201':
-          description: 'User created successfully and should activate his account by confirmation code that sent to him.'
-        '400':
-          description: 'BAD REQUEST, It happens when all required input not entered or the format of phone number is wrong.'
-        '500':
-          description: 'Internal error, or in some case database error and it might be because of duplication of the phone number.'
-        '409':
-          description: 'CONFLICT, the username is already exist'
-  
+        "201":
+          description: "User created successfully and should activate his account by confirmation code that sent to him."
+        "400":
+          description: "BAD REQUEST, It happens when all required input not entered or the format of phone number is wrong."
+        "500":
+          description: "Internal error, or in some case database error and it might be because of duplication of the phone number."
+        "409":
+          description: "CONFLICT, the username is already exist"
+
   /auth/confirmUser:
     post:
       tags:
-        - 'Auth'
-      summary: 'confirm user registration by confirmation code sent to him'
+        - "Auth"
+      summary: "confirm user registration by confirmation code sent to him"
       consumes:
-      - 'application/json'
+        - "application/json"
       produces:
-      - 'application/json'
+        - "application/json"
       requestBody:
         content:
           application/json:
@@ -82,37 +80,37 @@ paths:
                 - password
                 - confirmationCode
               example:
-                username: 'jesSmith'
-                password: 'a12345678'
-                confirmationCode: '123456'
+                username: "jesSmith"
+                password: "a12345678"
+                confirmationCode: "123456"
       responses:
-        '200':
-          description: 'User account activated but if the role of user is ADMIN, he has to wait to become confirm by SUPER_ADMIN'
-        '404': 
-          description: 'User with that username not found'
-        '400':
-          description: 'confirmation code is wrong, or expired or User status not equal to PENDING, or maybe all required input not entered'
-        '401':
-          description: 'Wrong password'
-        '500':
-          description: 'Database error'
+        "200":
+          description: "User account activated but if the role of user is ADMIN, he has to wait to become confirm by SUPER_ADMIN"
+        "404":
+          description: "User with that username not found"
+        "400":
+          description: "confirmation code is wrong, or expired or User status not equal to PENDING, or maybe all required input not entered"
+        "401":
+          description: "Wrong password"
+        "500":
+          description: "Database error"
 
   /auth/sendCode:
     post:
       tags:
-        - 'Auth'
-      summary: 'send verification code'
-      description: 'Send new confirmation code to user. Each user can requests for new confirmation code at must 5 time.'
+        - "Auth"
+      summary: "send verification code"
+      description: "Send new confirmation code to user. Each user can requests for new confirmation code at must 5 time."
       consumes:
-      - 'application/json'
+        - "application/json"
       produces:
-      - 'application/json'
+        - "application/json"
 
       requestBody:
         content:
           application/json:
             schema:
-              type: 'object'
+              type: "object"
               properties:
                 username:
                   type: string
@@ -122,36 +120,36 @@ paths:
                 - username
                 - password
               example:
-                username: 'jesSmith'
-                password: 'a12345678'
+                username: "jesSmith"
+                password: "a12345678"
       responses:
-        '200':
-          description: 'new confirmation code sent to the user. Just for test, the code exists in the response body'
-        '403': 
-          description: 'Account has been banned because of send confirmation code limitation. Each user can requests at most five time for new confirmation code.'
-        '400':
-          description: 'All input not entered, or confirmation code is still valid, or the user status not equal to PENDING'
-        '404':
-          description: 'User not found'
-        '401':
-          description: 'Wrong password'
-        '500':
-          description: 'Database error'
-            
+        "200":
+          description: "new confirmation code sent to the user. Just for test, the code exists in the response body"
+        "403":
+          description: "Account has been banned because of send confirmation code limitation. Each user can requests at most five time for new confirmation code."
+        "400":
+          description: "All input not entered, or confirmation code is still valid, or the user status not equal to PENDING"
+        "404":
+          description: "User not found"
+        "401":
+          description: "Wrong password"
+        "500":
+          description: "Database error"
+
   /auth/login:
     post:
       tags:
-        - 'Auth'
-      summary: 'Login to account'
+        - "Auth"
+      summary: "Login to account"
       consumes:
-      - 'application/json'
+        - "application/json"
       produces:
-      - 'application/json'
+        - "application/json"
       requestBody:
         content:
           application/json:
             schema:
-              type: 'object'
+              type: "object"
               properties:
                 username:
                   type: string
@@ -161,50 +159,50 @@ paths:
                 - username
                 - password
               example:
-                username: 'jesSmith'
-                password: 'a12345678'
-          
+                username: "jesSmith"
+                password: "a12345678"
+
       responses:
-        '200':
-          description: 'Successful login'
+        "200":
+          description: "Successful login"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
 
-        '404': 
-          description: 'User with that username not found'
-        '400':
-          description: 'All required input not entered'
-        '403':
-          description: 'User status is not eaual to ACCEPTED'
-        '401':
-          description: 'Wrong password'
-        '500':
-          description: 'Database error'
-    
+        "404":
+          description: "User with that username not found"
+        "400":
+          description: "All required input not entered"
+        "403":
+          description: "User status is not eaual to ACCEPTED"
+        "401":
+          description: "Wrong password"
+        "500":
+          description: "Database error"
+
   /auth/logout:
     get:
       tags:
-        - 'Auth'
-      summary: 'Logout'
+        - "Auth"
+      summary: "Logout"
       produces:
-      - 'application/json'
+        - "application/json"
       responses:
-        '200':
-          description: 'Successful logout'
-        '401':
-          description: 'The User is not authenticated yet'
+        "200":
+          description: "Successful logout"
+        "401":
+          description: "The User is not authenticated yet"
 
   /admin/post/:
     post:
       tags:
-        - 'Admin'
-      summary: 'Create new post by admin'
+        - "Admin"
+      summary: "Create new post by admin"
       consumes:
-      - 'multipart/form-data'
+        - "multipart/form-data"
       produces:
-      - 'application/json'
+        - "application/json"
       requestBody:
         content:
           multipart/form-data:
@@ -219,54 +217,54 @@ paths:
                 photo:
                   type: string
                   format: binary
-                  description: 'Only jpg, jpeg and png are acceptable.'
+                  description: "Only jpg, jpeg and png are acceptable."
               required:
                 - title
                 - caption
                 - photo
             example:
-              title: 'new post'
-              caption: 'this is a caption'
+              title: "new post"
+              caption: "this is a caption"
       responses:
-        '201':
-          description: 'Post created successfully'
+        "201":
+          description: "Post created successfully"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
+                $ref: "#/components/schemas/Post"
               example:
-                _id: '92830934823121'
-                title: 'new post'
-                caption: 'this is a caption'
-                photo: 'new photo'
-                createdAt: '2021-09-03T16:27:39.128Z'
+                _id: "92830934823121"
+                title: "new post"
+                caption: "this is a caption"
+                photo: "new photo"
+                createdAt: "2021-09-03T16:27:39.128Z"
                 comments: ["string"]
-        '413':
-          description: 'File is larger than amount specified in response'
-        '406':
-          description: 'Upload failed'
-        '500':
-          description: 'Upload failed or database error'
-        '400':
-          description: 'All input not entered'
-          
+        "413":
+          description: "File is larger than amount specified in response"
+        "406":
+          description: "Upload failed"
+        "500":
+          description: "Upload failed or database error"
+        "400":
+          description: "All input not entered"
+
   /admin/post/editPhoto/{postId}:
     patch:
       tags:
-        - 'Admin'
-      summary: 'Edit post photo'
-      description: 'Edit photo of post.'
+        - "Admin"
+      summary: "Edit post photo"
+      description: "Edit photo of post."
       consumes:
-        - 'multipart/form-data'
+        - "multipart/form-data"
       produces:
-        - 'application/json'
+        - "application/json"
       parameters:
         - in: path
-          name: postId   # Note the name is the same as in the path
+          name: postId # Note the name is the same as in the path
           required: true
           schema:
             type: string
-            example: '3242342390438203948'
+            example: "3242342390438203948"
           description: The post ID
       requestBody:
         content:
@@ -277,107 +275,107 @@ paths:
                 photo:
                   type: string
                   format: binary
-                  description: 'Only jpg, jpeg and png are acceptable.'
+                  description: "Only jpg, jpeg and png are acceptable."
               required:
                 - photo
       responses:
-        '200':
-          description: 'Post photo updated successfully.'
+        "200":
+          description: "Post photo updated successfully."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
-        '404':
-          description: 'Post not found!'
-        '400':
-          description: 'PostId not entered or not valid'
-        '413':
-          description: 'File is larger than amount specified in response'
-        '406':
-          description: 'Upload failed'
-        '500':
-          description: 'Upload failed or database error'
-  
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: "Post not found!"
+        "400":
+          description: "PostId not entered or not valid"
+        "413":
+          description: "File is larger than amount specified in response"
+        "406":
+          description: "Upload failed"
+        "500":
+          description: "Upload failed or database error"
+
   /admin/post/{postId}:
     patch:
       tags:
-        - 'Admin'
-      summary: 'Edit post'
-      description: 'Edit title and caption of post. NOT photo'
+        - "Admin"
+      summary: "Edit post"
+      description: "Edit title and caption of post. NOT photo"
       consumes:
-      - 'application/json'
+        - "application/json"
       produces:
-      - 'application/json'
+        - "application/json"
       parameters:
         - in: path
           name: postId
           required: true
           schema:
             type: string
-            description: 'The post id'
-            example: '392384794879848499'
+            description: "The post id"
+            example: "392384794879848499"
       requestBody:
         content:
           application/json:
             schema:
-              type: 'object'
+              type: "object"
               properties:
                 fieldsToUpdate:
-                  type: 'object'
+                  type: "object"
                   properties:
                     caption:
                       type: string
                     title:
                       type: string
-                  description: 'One of caption or title is required!'
+                  description: "One of caption or title is required!"
               required:
                 - fieldsToUpdate
               example:
                 fieldsToUpdate:
-                  title: 'This is edited title'
-                  caption: 'This is edited caption'
+                  title: "This is edited title"
+                  caption: "This is edited caption"
       responses:
-        '200':
-          description: 'Post edited successfully'
+        "200":
+          description: "Post edited successfully"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
-        '400':
-          description: 'All require input not entered, or postId is not valid'
-        '404':
-          description: 'Post not found!'
-        '500':
-          description: 'Database error'
+                $ref: "#/components/schemas/Post"
+        "400":
+          description: "All require input not entered, or postId is not valid"
+        "404":
+          description: "Post not found!"
+        "500":
+          description: "Database error"
 
     delete:
       tags:
-        - 'Admin'
-      summary: 'Delete post by its id'
+        - "Admin"
+      summary: "Delete post by its id"
       produces:
         - application/json
       parameters:
         - in: path
-          name: postId   # Note the name is the same as in the path
+          name: postId # Note the name is the same as in the path
           required: true
           schema:
             type: string
-            example: '3242342390438203948'
+            example: "3242342390438203948"
           description: The post ID
       responses:
-        '200':
-          description: 'Post deleted successfully'
-        '400':
-          description: 'postId is not valid'
-        '404':
-          description: 'Post not found with that id'
-        '500':
-          description: 'Database error'
+        "200":
+          description: "Post deleted successfully"
+        "400":
+          description: "postId is not valid"
+        "404":
+          description: "Post not found with that id"
+        "500":
+          description: "Database error"
   /admin/post/comment/{commentId}:
     patch:
       tags:
-        - 'Admin'
-      summary: 'ACCEPT or REJECT the comment'
+        - "Admin"
+      summary: "ACCEPT or REJECT the comment"
 
       consumes:
         - application/json
@@ -391,37 +389,37 @@ paths:
             default: 0
             enum: [0]
           required: true
-          description: 'Content-Length header should be set to 0'
+          description: "Content-Length header should be set to 0"
         - in: query
           name: status
           required: true
           schema:
             type: string
             enum: [ACCEPTED, REJECTED, PENDING]
-            example: 'ACCEPTED'
-          description: 'Accept or Reject the comment.'
+            example: "ACCEPTED"
+          description: "Accept or Reject the comment."
         - in: path
           name: commentId
           required: true
           schema:
             type: string
-            example: '382749729382982199'
-          description: 'Id of comment'
+            example: "382749729382982199"
+          description: "Id of comment"
       responses:
-        '200':
-          description: 'Comment status changed successfully'
-        '400':
-          description: 'CommentId is not valid'
-        '404':
-          description: 'Comment not found!'
-        '500':
-          description: 'Database error!'
+        "200":
+          description: "Comment status changed successfully"
+        "400":
+          description: "CommentId is not valid"
+        "404":
+          description: "Comment not found!"
+        "500":
+          description: "Database error!"
   /admin/post/comment:
     get:
       tags:
-        - 'Admin'
-      summary: 'Get All comments'
-      description: 'Get all comment based on which status admin wants'
+        - "Admin"
+      summary: "Get All comments"
+      description: "Get all comment based on which status admin wants"
       parameters:
         - in: query
           name: status
@@ -430,110 +428,108 @@ paths:
             enum: [ACCEPTED, REJECTED, PENDING]
           description: Optional, If you don't select status, it will fetchs all comments with all different status.
       responses:
-        '200':
-          description: 'Comments fetched successfully'
-        '500':
-          description: 'Database error!'
+        "200":
+          description: "Comments fetched successfully"
+        "500":
+          description: "Database error!"
 
   /post/:
     get:
       tags:
-        - 'Post'
-      summary: 'Get all posts'
+        - "Post"
+      summary: "Get all posts"
       produces:
-        - 'application/json'
+        - "application/json"
       responses:
-        '200':
-          description: 'posts fetched successfully'
+        "200":
+          description: "posts fetched successfully"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Post'
+                  $ref: "#/components/schemas/Post"
 
   /post/comment/{postId}:
     post:
-      summary: 'Create comment on specified post'
+      summary: "Create comment on specified post"
       tags:
-        - 'Post'
+        - "Post"
       produces:
-        - 'application/json'
+        - "application/json"
       consumes:
-        - 'application/json'
+        - "application/json"
       parameters:
         - in: path
           name: postId
           required: true
           schema:
             type: string
-            description: 'The post id'
-            example: '2839284398793849384'
+            description: "The post id"
+            example: "2839284398793849384"
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                text: 
+                text:
                   type: string
-                  example: 'This is the comment!!'
+                  example: "This is the comment!!"
               required:
                 - text
       responses:
-        '201': 
-          description: 'Comment submitted successfully. user should wait until admin confirm his comment to show in post'
-        '400':
-          description: 'postId is not valid or requestBody not entered'
-        '404':
-          description: 'post not found!'
-        '500':
-          description: 'Database error!'
-
-      
+        "201":
+          description: "Comment submitted successfully. user should wait until admin confirm his comment to show in post"
+        "400":
+          description: "postId is not valid or requestBody not entered"
+        "404":
+          description: "post not found!"
+        "500":
+          description: "Database error!"
 
   /superAdmin/:
     get:
       tags:
-        - 'Super Admin'
-      summary: 'Get all admins'
-      description: 'Get admins based on the status you specified. If the status is not specified, ALL admins will be fetch'
+        - "Super Admin"
+      summary: "Get all admins"
+      description: "Get admins based on the status you specified. If the status is not specified, ALL admins will be fetch"
       produces:
-        - 'application/json'
+        - "application/json"
       parameters:
         - in: query
           name: status
           schema:
             type: string
             enum: [ACCEPTED, SUPER_ADMIN_PENDING]
-            example: 'ACCEPTED'
-          description: 'ACCEPTED admin is the admin that has been accepted by superUser before. But the SUPER_ADMIN_PENDING admin is waiting for superUser to be accepted.'
+            example: "ACCEPTED"
+          description: "ACCEPTED admin is the admin that has been accepted by superUser before. But the SUPER_ADMIN_PENDING admin is waiting for superUser to be accepted."
       responses:
-        '200':
-          description: 'Admins fetched successfully'
+        "200":
+          description: "Admins fetched successfully"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: "#/components/schemas/User"
               example:
-                - _id: '2839284398793849384'
-                  username: 'jesSmith'
-                  firstName: 'Jessica'
-                  lastName: 'Smith'
-                  phoneNumber: '09221234321'
-                  createdAt: '2021-09-03T16:27:39.128Z'
-                  status: 'SUPER_ADMIN_PENDING'
+                - _id: "2839284398793849384"
+                  username: "jesSmith"
+                  firstName: "Jessica"
+                  lastName: "Smith"
+                  phoneNumber: "09221234321"
+                  createdAt: "2021-09-03T16:27:39.128Z"
+                  status: "SUPER_ADMIN_PENDING"
 
   /superAdmin/{username}:
     post:
       tags:
-        - 'Super Admin'
-      summary: 'Verify admin'
-      description: 'Super_Admin verify admin'
+        - "Super Admin"
+      summary: "Verify admin"
+      description: "Super_Admin verify admin"
       produces:
-        - 'application/json'
+        - "application/json"
       parameters:
         - in: header
           name: Content-Length
@@ -542,22 +538,22 @@ paths:
             default: 0
             enum: [0]
           required: true
-          description: 'Content-Length header should be set to 0'
+          description: "Content-Length header should be set to 0"
         - in: path
           name: username
           required: true
           schema:
             type: string
-            example: 'jonBarr'
-          description: 'Username of user'
+            example: "jonBarr"
+          description: "Username of user"
       responses:
-        '200':
-          description: 'Successful'
-                
+        "200":
+          description: "Successful"
+
 components:
   schemas:
     User:
-      type: 'object'
+      type: "object"
       properties:
         _id:
           type: string
@@ -569,27 +565,27 @@ components:
           type: string
         phoneNumber:
           type: string
-        createdAt: 
+        createdAt:
           type: string
       example:
-        _id: '2839284398793849384'
-        username: 'jesSmith'
-        firstName: 'Jessica'
-        lastName: 'Smith'
-        phoneNumber: '09221234321'
-        createdAt: '2021-09-03T16:27:39.128Z'
+        _id: "2839284398793849384"
+        username: "jesSmith"
+        firstName: "Jessica"
+        lastName: "Smith"
+        phoneNumber: "09221234321"
+        createdAt: "2021-09-03T16:27:39.128Z"
     Post:
-      type: 'object'
+      type: "object"
       properties:
         _id:
           type: string
         title:
           type: string
         caption:
-          type: string   
+          type: string
         photo:
-          type: string       
-        createdAt: 
+          type: string
+        createdAt:
           type: string
         prevPhotos:
           type: array
@@ -622,29 +618,29 @@ components:
               type: string
 
       example:
-        _id: '92830934823121'
-        title: 'new post'
-        caption: 'this is a caption'
-        photo: 'new photo'
-        createdAt: '2021-09-03T16:27:39.128Z'
+        _id: "92830934823121"
+        title: "new post"
+        caption: "this is a caption"
+        photo: "new photo"
+        createdAt: "2021-09-03T16:27:39.128Z"
         comments:
           - user:
-              firstName: 'John'
-              lastName: 'Doe'
-              username: 'johnDoe'
-            text: 'it was good post'
-            createdAt: '2021-09-03T16:27:39.128Z'
-            _id: '92830934823121'
+              firstName: "John"
+              lastName: "Doe"
+              username: "johnDoe"
+            text: "it was good post"
+            createdAt: "2021-09-03T16:27:39.128Z"
+            _id: "92830934823121"
           - user:
-              firstName: 'jonatاan'
-              lastName: 'barnett'
-              username: 'jonBar'
-            text: 'not bad'
-            createdAt: '2021-09-03T16:27:39.128Z'
-            _id: '92830934823121'
+              firstName: "jonatاan"
+              lastName: "barnett"
+              username: "jonBar"
+            text: "not bad"
+            createdAt: "2021-09-03T16:27:39.128Z"
+            _id: "92830934823121"
 
     Comment:
-      type: 'object'
+      type: "object"
       properties:
         user:
           type: object
@@ -663,9 +659,9 @@ components:
           type: string
       example:
         user:
-          firstName: 'John'
-          lastName: 'Doe'
-          username: 'johnDoe'
-        text: 'it was good post'
-        createdAt: '2021-09-03T16:27:39.128Z'
-        _id: '92830934823121'
+          firstName: "John"
+          lastName: "Doe"
+          username: "johnDoe"
+        text: "it was good post"
+        createdAt: "2021-09-03T16:27:39.128Z"
+        _id: "92830934823121"

@@ -33,3 +33,44 @@ npm run dev
    
    
    ### API documentation is available in http://localhost:5000/api-docs
+   
+  
+   # Docker
+   
+   ## for development purpose:
+   
+   to build an image:
+  ```sh
+   docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml build
+  ```
+  
+  to create container from that image:
+   to build an image:
+  ```sh
+   docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d
+  ```
+  ##### To make sure that container is running currectly, check : http://localhost:8080/ping
+  
+ ## for production purpose:
+
+to build an image:
+  ```sh
+   docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml build
+  ```
+  
+  to create container from that image:
+   to build an image:
+  ```sh
+   docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+  ```
+### Before running the container in production some Environment variable should be set:
+- MONGO_INITDB_ROOT_USERNAME 
+- MONGO_INITDB_ROOT_PASSWORD
+    These are username and password that can access the MongoDB inside the container
+- MONGO_USER
+- MONGO_PASSWORD
+  These two username and password must be the same as the previous root username and password
+
+
+ 
+  

@@ -45,11 +45,10 @@ npm run dev
   ```
   
   to create container from that image:
-   to build an image:
   ```sh
    docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d
   ```
-  ##### To make sure that container is running currectly, check : http://localhost:8080/ping
+  ##### To make sure that container is running correctly, check : http://localhost:8080/ping
   
  ## for production purpose:
 
@@ -59,7 +58,6 @@ to build an image:
   ```
   
   to create container from that image:
-   to build an image:
   ```sh
    docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
   ```

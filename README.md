@@ -32,7 +32,7 @@ npm run dev
    [redis]: <https://redis.io/>
    
    
-   ### API documentation is available in http://localhost:5000/api-docs
+   ### API documentation is available at http://localhost:5000/api-docs
    
   
    # Docker
@@ -63,10 +63,10 @@ to build an image:
   ```
 ### Before running the container in production some Environment variable should be set:
 - MONGO_INITDB_ROOT_USERNAME 
-- MONGO_INITDB_ROOT_PASSWORD
+- MONGO_INITDB_ROOT_PASSWORD\
     These are username and password that can access the MongoDB inside the container
 - MONGO_USER
-- MONGO_PASSWORD
+- MONGO_PASSWORD\
   These two username and password must be the same as the previous root username and password
 
 

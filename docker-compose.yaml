@@ -3,16 +3,21 @@ services:
   nginx:
     container_name: nginx
     ports:
-      - "8080:80"
+      - "8081:80"
     build:
       context: ./nginx
+    networks:
+      - nginx-net
     depends_on:
       - node-app
 
   node-app:
-    container_name: node_app
+    container_name: node-app
     # environment:
     #   - PORT=3000
+    networks:
+      - api-net
+      - nginx-net
     depends_on:
       - mongo
       - redis
@@ -22,14 +27,22 @@ services:
     container_name: mongodb
     volumes:
       - mongo-db:/data/db
+    networks:
+      - api-net
 
   redis:
     image: redis
     container_name: redis
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - redis_data:/data
+      - redis-data:/data
+    networks:
+      - api-net
 
 volumes:
   mongo-db:
-  redis_data:
+  redis-data:
+
+networks:
+  api-net: {}
+  nginx-net: {}

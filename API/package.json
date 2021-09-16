@@ -1,0 +1,50 @@
+{
+  "name": "night-sky-gallery-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest  --coverage --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "start": "node index.js",
+    "dev": "cross-env NODE_ENV=dev nodemon -L index.js",
+    "devv": "cross-env NODE_ENV=development nodemon -L index.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "date-and-time": "^2.0.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "form-data": "^4.0.0",
+    "fs-extra": "^10.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mime-types": "^2.1.32",
+    "mkdirp": "^1.0.4",
+    "mongoose": "^6.0.4",
+    "multer": "^1.4.3",
+    "prompts": "^2.4.1",
+    "randomatic": "^3.1.1",
+    "rate-limiter-flexible": "^2.2.4",
+    "redis": "^3.1.2",
+    "swagger-ui-express": "^4.1.6",
+    "validator": "^13.6.0",
+    "winston": "^3.3.3",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "jest": "^27.1.0",
+    "nodemon": "^2.0.12",
+    "supertest": "^6.1.6"
+  }
+}

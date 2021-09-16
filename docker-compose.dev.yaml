@@ -1,16 +1,16 @@
 version: "3"
 services:
-  # nginx:
-  #   ports:
-  #   # 3000 is port that we request on it, and when request arrives in port 3000, it will map request to port 5000 that nginx is liestining on it
-  #     - "3000:5000"
+  nginx:
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/web-root:/usr/share/nginx/html/
   node-app:
     build:
-      context: .
+      context: ./API
       args:
         NODE_ENV: development
     volumes:
-      - ./:/app
+      - ./API:/app
       - /app/node_modules
       # - /app/uploads
     environment:
@@ -21,6 +21,6 @@ services:
     command: npm run devv
   mongo:
     environment:
-    # this is just for dev purpose
+      # this is just for dev purpose
       - MONGO_INITDB_ROOT_USERNAME=testUser
       - MONGO_INITDB_ROOT_PASSWORD=mongoPassword

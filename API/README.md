@@ -15,7 +15,7 @@ At first you should Install the api dependencies and devDepenendencies and start
 
 You should install MongoDB and redis-server before.
 ```sh
-cd night-sky-gallery-backend-master
+cd night-sky-gallery-backend-master/API
 npm i
 sudo service redis-server start
 mongod

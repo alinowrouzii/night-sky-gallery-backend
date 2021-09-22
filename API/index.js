@@ -1,6 +1,6 @@
 //mongoDB connection setup
 const logger = require("./config/logger.js");
-const mongooseSetup = require("./config/mongooseSetup.js");
+const mongooseSetup = require("./config/DBSetup.js");
 const app = require("./app");
 
 let attempt = 0;

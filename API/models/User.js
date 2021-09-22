@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        enum: [userTypes.SUBSCRIBER, userTypes.ADMIN, userTypes.SUPER_ADMIN],
+        enum: [userTypes.SUBSCRIBER, userTypes.ADMIN],
         select: false
     },
     status: {

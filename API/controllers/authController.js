@@ -1,14 +1,12 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { userStatus, userTypes } = require('./../models/constants');
-const { generatePassword, validatePassword } = require('./../lib/generatePassword')
 const { jwtExpirySeconds } = require('./constants');
 const randomize = require('randomatic');
 const date = require('date-and-time');
 const logger = require("../config/logger");
 const validator = require('validator');
-
-const { TOKEN_KEY } = process.env;
+const { TOKEN_KEY } = require("./../config/index.js");
 
 exports.login = async (req, res) => {
 

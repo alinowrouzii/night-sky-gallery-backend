@@ -2,6 +2,48 @@ const mongoose = require("mongoose");
 const User = require("./../models/User.js");
 const { userTypes, userStatus } = require("./../models/constants.js");
 const logger = require('./../config/logger');
+const SuperAdmin = require('./../models/SuperAdmin.js');
+const jwt = require("jsonwebtoken");
+const { jwtExpirySeconds } = require("./constants.js");
+const { TOKEN_KEY } = require("./../config/index.js");
+
+exports.superadminLogin = async (req, res) => {
+
+    const { username, password } = req.body;
+
+    if (!(username && password)) {
+        return res.status(400).send("All input is required");
+    }
+
+    try {
+        const user = await SuperAdmin.findOne({ username, }).select('+password');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found!' });
+        }
+
+        if (user.verifyPassword(password)) {
+
+            const token = jwt.sign({ _id: user._id, username, role: userTypes.SUPER_ADMIN }
+                , TOKEN_KEY, {
+                algorithm: "HS256",
+                expiresIn: jwtExpirySeconds,
+            });
+
+            // console.log("token:", token);
+
+            res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 });
+
+            return res.status(200).json({ user: { username: user.username }, message: 'You have been successfully logged in' });
+        }
+        return res.status(401).json({ message: 'گذرواژه اشتباه میباشد' });
+    } catch (err) {
+        logger.error(err.msg || err.message || err);
+        console.log(err)
+        return res.status(500).json({ message: 'Database error!' });
+    }
+}
+
 
 exports.verifyAdmin = async (req, res) => {
 

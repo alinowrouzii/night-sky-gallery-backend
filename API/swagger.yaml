@@ -489,6 +489,46 @@ paths:
           description: "Database error!"
 
   /superAdmin/:
+    post:
+      tags:
+        - "Super Admin"
+      summary: "Login as superadmin"
+      produces:
+        - "application/json"
+      consumes:
+        - "application/json"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "superadmin"
+                password:
+                  type: string
+                  example: "superadminPassword"
+              required:
+                - username
+                - password
+      responses:
+        "200":
+          description: "Successfully logged in"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: superadmin
+                  
+        "400":
+          description: "username or password not entered or password is wrong"
+        "500":
+          description: "Database error!"
+
     get:
       tags:
         - "Super Admin"

@@ -21,4 +21,5 @@ module.exports = {
   MONGO_URL,
   REDIS_URL: process.env.REDIS_URL || "redis",
   REDIS_PORT: process.env.REDIS_PORT || 6379,
+  TOKEN_KEY: process.env.TOKEN_KEY
 };

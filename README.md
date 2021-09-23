@@ -23,7 +23,7 @@ It runs "mongod" && "sudo service redis-server start" in the background
 
 ### Create new superAdmin
 ```sh
-NODE_ENV=env node initSuperAdmin.js
+NODE_ENV=dev node initSuperAdmin.js
 ```
 It prompts you to enter a username & password for super admin. It also drops the database.
 

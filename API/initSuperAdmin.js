@@ -3,7 +3,7 @@ const { MONGO_URL } = require('./config/index.js')
 const DBSetup = require('./config/DBSetup.js');
 const prompts = require('prompts');
 const SuperAdmin = require('./models/SuperAdmin.js');
-
+const shell = require('shelljs');
 const questions = [
     {
         type: 'text',
@@ -44,6 +44,10 @@ const questions = [
 const createSuperAdmin = async ({ username, password }) => {
 
     try {
+        if(process.env.NODE_ENV === 'dev'){
+            shell.exec('mongod --fork --logpath db/logfile.log --logappend')
+        }
+
         await DBSetup();
         console.log("MongoDB connected for dropping.");
 

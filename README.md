@@ -17,10 +17,15 @@ You should install MongoDB and redis-server before.
 ```sh
 cd night-sky-gallery-backend-master/API
 npm i
-sudo service redis-server start
-mongod
 npm run dev
 ```
+It runs "mongod" && "sudo service redis-server start" in the background
+
+Create new superAdmin
+```sh
+NODE_ENV=env node initSuperAdmin.js
+```
+It prompts you to enter a username & password for super admin. It also drops the database.
 
    [Socket.io]: <https://socket.io/>
    [express]: <http://expressjs.com>

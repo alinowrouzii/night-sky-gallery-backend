@@ -7,7 +7,7 @@
     "test": "jest  --coverage --detectOpenHandles",
     "test:watch": "jest --watch",
     "start": "node index.js",
-    "dev": "cross-env NODE_ENV=dev nodemon -L index.js",
+    "dev": "cross-env NODE_ENV=dev sh start_up_dev.sh",
     "devv": "cross-env NODE_ENV=development nodemon -L index.js"
   },
   "jest": {

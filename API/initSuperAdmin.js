@@ -45,7 +45,7 @@ const createSuperAdmin = async ({ username, password }) => {
 
     try {
         if(process.env.NODE_ENV === 'dev'){
-            shell.exec('mongod --fork --logpath db/logfile.log --logappend')
+            shell.exec('sudo service mongod start')
         }
 
         await DBSetup();

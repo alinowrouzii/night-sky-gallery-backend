@@ -4,3 +4,4 @@ uploads
 logs
 tests/Data/files
 coverage
+db

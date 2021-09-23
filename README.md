@@ -21,7 +21,7 @@ npm run dev
 ```
 It runs "mongod" && "sudo service redis-server start" in the background
 
-Create new superAdmin
+### Create new superAdmin
 ```sh
 NODE_ENV=env node initSuperAdmin.js
 ```

@@ -1,4 +1,5 @@
 //mongoDB connection setup
+const shell = require('shelljs')
 const logger = require("./config/logger.js");
 const mongooseSetup = require("./config/DBSetup.js");
 const app = require("./app");
@@ -29,3 +30,10 @@ const runApi = () => {
 };
 
 runApi();
+
+if (process.env.NODE_ENV === 'dev') {
+  process.on('SIGINT', function () {
+    shell.exec('mongod --shutdown\nsudo service redis-server stop');
+    process.exit(0);
+  });
+}

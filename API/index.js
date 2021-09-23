@@ -33,7 +33,8 @@ runApi();
 
 if (process.env.NODE_ENV === 'dev') {
   process.on('SIGINT', function () {
-    shell.exec('mongod --shutdown\nsudo service redis-server stop');
+    shell.exec('sudo service mongod stop\nsudo service redis-server stop');
+    // shell.exec('mongod --shutdown\nsudo service redis-server stop');
     process.exit(0);
   });
 }

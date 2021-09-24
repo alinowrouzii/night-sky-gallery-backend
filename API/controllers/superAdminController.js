@@ -12,7 +12,7 @@ exports.superadminLogin = async (req, res) => {
     const { username, password } = req.body;
 
     if (!(username && password)) {
-        return res.status(400).send("All input is required");
+        return res.status(400).json({ message: "All input is required" });
     }
 
     try {

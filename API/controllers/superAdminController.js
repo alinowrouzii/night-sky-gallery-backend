@@ -40,7 +40,7 @@ exports.superadminLogin = async (req, res) => {
     } catch (err) {
         logger.error(err.msg || err.message || err);
         console.log(err)
-        return res.status(500).json({ message: 'Database error!' });
+        return res.status(500).json({ message: err.msg || err.message || 'Database error!' });
     }
 }
 

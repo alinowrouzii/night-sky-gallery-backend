@@ -5,7 +5,7 @@ const { TOKEN_KEY } = process.env;
 
 exports.verifyToken = (req, res, next) => {
     //take the token from cookie
-    const token = req.cookies.token
+    const token = req.cookies?.token
 
     if (!token) {
         return res.status(401).json({message:"A token is required for authentication"});

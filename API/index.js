@@ -2,7 +2,10 @@
 const shell = require('shelljs')
 const logger = require("./config/logger.js");
 const mongooseSetup = require("./config/DBSetup.js");
-const app = require("./app");
+const app_config = require("./app");
+const express = require('express');
+
+
 
 let attempt = 0;
 const MAX_ATTEMPT = 5;
@@ -14,6 +17,13 @@ const runApi = () => {
   mongooseSetup()
     .then(() => {
       logger.info("MongoDB connected!!");
+
+      const app = express();
+
+      const admin_bro = require('./routes/admin_test');
+      app.use(admin_bro.options.rootPath, admin_bro.router);
+
+      app_config(app);
 
       const PORT = process.env.PORT || 5000;
       app.listen(PORT, () => logger.info(`Server is running on Port: ${PORT}`));

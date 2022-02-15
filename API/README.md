@@ -73,6 +73,18 @@ to build an image:
 - MONGO_USER
 - MONGO_PASSWORD\
   This two username and password must be the same as the previous root username and password
+  
+  
+  
+  
+ 
+
+### Se the documentation at http://localhost:5000/api-docs :
+
+![Doc page](https://github.com/alinowrouzii/night-sky-gallery-backend/blob/master/readme/doc_page.png)
+![Create post](https://github.com/alinowrouzii/night-sky-gallery-backend/blob/master/readme/create_post.png)
+
+ 
 
 
  
